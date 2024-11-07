@@ -22,18 +22,33 @@ protected:
 	bool render();
 	void depthPass();
 	void finalPass();
+	void shadowPass();
 	void gui();
 
 private:
+
+	float lightx = 0.0f;
+	float lighty = 0.0f;
+	float lightz = 0.0f;
+
+	float lightDirx = 0.1f;
+	float lightDiry = 0.1f;
+	float lightDirz = 0.1f;
+
+	int screenW;
+
 	TextureShader* textureShader;
 	PlaneMesh* mesh;
+	CubeMesh* cubeMesh;
 
 	Light* light;
 	AModel* model;
 	ShadowShader* shadowShader;
 	DepthShader* depthShader;
-
+	OrthoMesh* orthoMesh;
 	ShadowMap* shadowMap;
+
+	RenderTexture* renderTexture;
 };
 
 #endif

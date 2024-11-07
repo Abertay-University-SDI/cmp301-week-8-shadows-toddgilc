@@ -14,6 +14,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	// Create Mesh object and shader object
 	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
+	orthoMesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth / 4, screenHeight / 4, -screenWidth / 2.7, screenHeight / 2.7);
+
 	model = new AModel(renderer->getDevice(), "res/teapot.obj");
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 
@@ -23,8 +25,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	shadowShader = new ShadowShader(renderer->getDevice(), hwnd);
 
 	// Variables for defining shadow map
-	int shadowmapWidth = 1024;
-	int shadowmapHeight = 1024;
+	int shadowmapWidth = 2048;
+	int shadowmapHeight = 2048;
 	int sceneWidth = 100;
 	int sceneHeight = 100;
 
@@ -39,6 +41,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	light->setPosition(0.f, 0.f, -10.f);
 	light->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 
+	screenW = screenWidth;
 }
 
 App1::~App1()
@@ -73,6 +76,11 @@ bool App1::frame()
 
 bool App1::render()
 {
+	
+	light->setPosition(lightx, lighty, lightz);
+
+	light->setDirection(lightDirx, lightDiry, lightDirz);
+
 
 	// Perform depth pass
 	depthPass();
@@ -93,6 +101,8 @@ void App1::depthPass()
 	XMMATRIX lightProjectionMatrix = light->getOrthoMatrix();
 	XMMATRIX worldMatrix = renderer->getWorldMatrix();
 
+
+
 	worldMatrix = XMMatrixTranslation(-50.f, 0.f, -10.f);
 	// Render floor
 	mesh->sendData(renderer->getDeviceContext());
@@ -112,6 +122,30 @@ void App1::depthPass()
 	renderer->setBackBufferRenderTarget();
 	renderer->resetViewport();
 }
+
+
+void App1::shadowPass()
+{
+	// Set the render target to be the render to texture and clear it
+	renderTexture->setRenderTarget(renderer->getDeviceContext());
+	renderTexture->clearRenderTarget(renderer->getDeviceContext(), 1.0f, 0.0f, 0.0f, 1.0f);
+
+	// Get matrices
+	camera->update(); //use cam 1 here for diff cam
+	XMMATRIX worldMatrix = renderer->getWorldMatrix();
+	XMMATRIX viewMatrix = camera->getViewMatrix(); //use cam 1 here for diff cam
+	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
+
+	// Render shape with simple lighting shader set.
+	cubeMesh->sendData(renderer->getDeviceContext());
+	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), light);
+	shadowShader->render(renderer->getDeviceContext(), cubeMesh->getIndexCount());
+
+	// Reset the render target back to the original back buffer and not the render to texture anymore.
+	renderer->setBackBufferRenderTarget();
+}
+
+
 
 void App1::finalPass()
 {
@@ -140,10 +174,21 @@ void App1::finalPass()
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), light);
 	shadowShader->render(renderer->getDeviceContext(), model->getIndexCount());
 
+
+
+	renderer->setZBuffer(false);
+	XMMATRIX orthoMatrix = renderer->getOrthoMatrix();  // ortho matrix for 2D rendering
+	XMMATRIX orthoViewMatrix = camera->getOrthoViewMatrix();	// Default camera position for orthographic rendering
+
+	orthoMesh->sendData(renderer->getDeviceContext());
+	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, shadowMap->getDepthMapSRV());
+	textureShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
+
+	renderer->setZBuffer(true);
+
 	gui();
 	renderer->endScene();
 }
-
 
 
 void App1::gui()
@@ -156,6 +201,12 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
+
+	ImGui::SliderFloat("LightposX", &lightx, -100, 100);
+	ImGui::SliderFloat("LightposY", &lighty, -100, 100);
+	ImGui::SliderFloat("LightposZ", &lightz, -100, 100);
+
+	ImGui::SliderFloat3("Light1 Dir XYZ", (&lightDirx, &lightDiry, &lightDirz), -1, 1);
 
 	// Render UI
 	ImGui::Render();
