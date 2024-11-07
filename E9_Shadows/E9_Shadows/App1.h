@@ -35,11 +35,18 @@ private:
 	float lightDiry = 0.1f;
 	float lightDirz = 0.1f;
 
-	int screenW;
+	float matrixRotation = 0;
+
+	int screenW;	// need to uipdatye shadows
+	
+	int sceneW;
+	int sceneH;
 
 	TextureShader* textureShader;
 	PlaneMesh* mesh;
 	CubeMesh* cubeMesh;
+	CubeMesh* cubeMesh2;
+	SphereMesh* sphereMesh;
 
 	Light* light;
 	AModel* model;
