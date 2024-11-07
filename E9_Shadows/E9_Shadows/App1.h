@@ -31,9 +31,20 @@ private:
 	float lighty = 0.0f;
 	float lightz = 0.0f;
 
+	float light2x = 0.0f;
+	float light2y = 0.0f;
+	float light2z = 0.0f;
+
 	float lightDirx = 0.1f;
 	float lightDiry = 0.1f;
 	float lightDirz = 0.1f;
+
+	float lightDir2x = 0.1f;
+	float lightDir2y = 0.1f;
+	float lightDir2z = 0.1f;
+
+	float light1Colour[3];
+	float light2Colour[3];
 
 	float matrixRotation = 0;
 
@@ -48,7 +59,7 @@ private:
 	CubeMesh* cubeMesh2;
 	SphereMesh* sphereMesh;
 
-	Light* light;
+	Light* myLights[2];
 	AModel* model;
 	ShadowShader* shadowShader;
 	DepthShader* depthShader;
