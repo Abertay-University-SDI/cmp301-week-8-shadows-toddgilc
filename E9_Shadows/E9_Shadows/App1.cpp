@@ -81,9 +81,9 @@ bool App1::frame()
 
 bool App1::render()
 {
-	light->generateOrthoMatrix((float)sceneW, (float)sceneH, 0.1f, 100.f);
+	light->generateOrthoMatrix((float)sceneW, (float)sceneH, 0.1f, 100.f); // nEED TO FOLOW CAM LIVE yey
 	light->setPosition(lightx, lighty, lightz);
-	//light->setDirection(lightDirx, lightDiry, lightDirz);
+	light->setDirection(lightDirx, lightDiry, lightDirz);
 
 
 	// Perform depth pass
@@ -201,6 +201,7 @@ void App1::finalPass()
 	shadowShader->render(renderer->getDeviceContext(), model->getIndexCount());
 	worldMatrix = XMMatrixRotationY(0);
 
+
 	XMMATRIX worldMatrix2 = renderer->getWorldMatrix();
 	worldMatrix2 = XMMatrixRotationY(matrixRotation) * XMMatrixTranslation(0.f, 17.f, 19.f);
 	XMMATRIX scaleMatrix2 = XMMatrixScaling(0.5f, 0.5f, 0.5f);
@@ -242,7 +243,10 @@ void App1::gui()
 	ImGui::SliderFloat("LightposY", &lighty, -100, 100);
 	ImGui::SliderFloat("LightposZ", &lightz, -100, 100);
 
-	//ImGui::SliderFloat3("Light1 Dir XYZ", (&lightDirx, &lightDiry, &lightDirz), -1, 1);
+	ImGui::SliderFloat("LightdirX", &lightDirx, -1, 1);
+	ImGui::SliderFloat("LightdirY", &lightDiry, -1, 1);
+	ImGui::SliderFloat("LightdirZ", &lightDirz, -1, 1);
+
 
 	// Render UI
 	ImGui::Render();
