@@ -93,7 +93,7 @@ float4 main(InputType input) : SV_TARGET
             }
         }
         ambientL = thisLight.ambient;
-        colour[i] = saturate(colour[i] );
+      //  colour[i] = saturate(colour[i]);
     }
-    return ambientL + (saturate(colour[0] * colour[1]) * textureColour);
+    return ambientL + (saturate(colour[0] + colour[1]) * textureColour);
 }

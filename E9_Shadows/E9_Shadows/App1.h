@@ -58,6 +58,7 @@ private:
 	CubeMesh* cubeMesh;
 	CubeMesh* cubeMesh2;
 	SphereMesh* sphereMesh;
+	SphereMesh* sphereMesh2;
 
 	Light* myLights[2];
 	AModel* model;

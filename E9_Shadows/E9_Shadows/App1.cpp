@@ -15,6 +15,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	// Create Mesh object and shader object
 	mesh = new PlaneMesh(renderer->getDevice(), renderer->getDeviceContext());
 	sphereMesh = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
+	sphereMesh2 = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 	cubeMesh2 = new CubeMesh(renderer->getDevice(), renderer->getDeviceContext());
 	orthoMesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth / 4, screenHeight / 4, -screenWidth / 2.7, screenHeight / 2.7);
 
@@ -43,13 +44,13 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	myLights[0]->setDirection(0.0f, -0.7f, 0.7f);
 	myLights[0]->setPosition(0.f, 0.f, -10.f);
 	myLights[0]->setDiffuseColour(0.3f, 0.2f, 0.6f, 1.0f);
-	myLights[0]->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
+	myLights[0]->setAmbientColour(0.3f, 0.1f, 0.3f, 1.0f);
 
 
 	myLights[1]->setDirection(0.0f, -0.7f, 0.7f);
 	myLights[1]->setPosition(0.f, 0.f, -10.f);
 	myLights[1]->setDiffuseColour(1.0f, 1.0f, 1.0f, 1.0f);
-	myLights[1]->setAmbientColour(0.3f, 0.3f, 0.3f, 1.0f);
+	myLights[1]->setAmbientColour(0.6f, 0.3f, 0.3f, 1.0f);
 
 	myLights[0]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 	myLights[1]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
@@ -211,6 +212,14 @@ void App1::finalPass()
 	sphereMesh->sendData(renderer->getDeviceContext());
 	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix4, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), myLights);
 	shadowShader->render(renderer->getDeviceContext(), sphereMesh->getIndexCount());
+
+	XMMATRIX worldMatrix5 = renderer->getWorldMatrix();
+	worldMatrix5 = XMMatrixTranslation(light2x, light2y, light2z);
+	//XMMATRIX scaleMatrix2 = XMMatrixScaling(0.5f, 0.5f, 0.5f);e
+	sphereMesh2->sendData(renderer->getDeviceContext());
+	shadowShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix5, viewMatrix, projectionMatrix, textureMgr->getTexture(L"brick"), shadowMap->getDepthMapSRV(), myLights);
+	shadowShader->render(renderer->getDeviceContext(), sphereMesh2->getIndexCount());
+
 
 
 
