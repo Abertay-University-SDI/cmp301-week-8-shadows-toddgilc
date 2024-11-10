@@ -1,6 +1,6 @@
 
 Texture2D shaderTexture : register(t0);
-Texture2D depthMapTexture : register(t1);
+Texture2D depthMapTexture[2] : register(t1);
 
 SamplerState diffuseSampler  : register(s0);
 SamplerState shadowSampler : register(s1);
@@ -23,8 +23,10 @@ struct InputType
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
-    float4 lightViewPos : TEXCOORD1;
+    float4 lightViewPos[2] : TEXCOORD1;
 };
+
+
 
 // Calculate lighting intensity based on direction and normal. Combine with light colour.
 float4 calculateLighting(float3 lightDirection, float3 normal, float4 diffuse)
@@ -75,23 +77,24 @@ float4 main(InputType input) : SV_TARGET
     float4 colour[2];
     float4 textureColour = shaderTexture.Sample(diffuseSampler, input.tex);
 	// Calculate the projected texture coordinates.
-    float2 pTexCoord = getProjectiveCoords(input.lightViewPos);
-	
-    // Shadow test. Is or isn't in shadowc 
-    for (int i = 0; i < 2; i++)
-    {
-        aLight thisLight = mylights[i];
-        colour[i] = (0.0f, 0.0f, 0.0f, 1.0f);
-        if (hasDepthData(pTexCoord))
+
+        for (int i = 0; i < 2; i++)
         {
-        // Has depth map data
-            if (!isInShadow(depthMapTexture, pTexCoord, input.lightViewPos, shadowMapBias))
+            aLight thisLight = mylights[i];
+            colour[i] = (0.0f, 0.0f, 0.0f, 1.0f);
+            float2 pTexCoord = getProjectiveCoords(input.lightViewPos[i]);
+        
+            if (hasDepthData(pTexCoord))
             {
+        // Has depth map data
+                if (!isInShadow(depthMapTexture[i], pTexCoord, input.lightViewPos[i], shadowMapBias))
+                {
             // is NOT in shadow, therefore light
-                colour[i] = calculateLighting(-thisLight.direction, input.normal, thisLight.diffuse);
+                    colour[i] = calculateLighting(-thisLight.direction, input.normal, thisLight.diffuse);
+                }
             }
-        }
         //colour[i] = saturate(colour[i]);
+       
     }
     return (saturate(colour[0] + colour[1] + mylights[0].ambient)) * textureColour;
 }

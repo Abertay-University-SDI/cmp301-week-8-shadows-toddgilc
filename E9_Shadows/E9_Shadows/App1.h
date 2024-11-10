@@ -43,15 +43,15 @@ private:
 	float lightDir2y = 0.1f;
 	float lightDir2z = 0.1f;
 
-	float light1Colour[3] = {0,0,0};
+	float light1Colour[3] = { 0,0,0 };
 	float light2Colour[3] = { 0,0,0 };
 
 	float matrixRotation = 0;
 
 	int screenW;	// need to uipdatye shadows
 	
-	int sceneW;
-	int sceneH;
+	int sceneWidth = 100;
+	int sceneHeight = 100;
 
 	TextureShader* textureShader;
 	PlaneMesh* mesh;
@@ -65,7 +65,9 @@ private:
 	ShadowShader* shadowShader;
 	DepthShader* depthShader;
 	OrthoMesh* orthoMesh;
-	ShadowMap* shadowMap;
+	ShadowMap* shadowMap[2];
+
+	ID3D11ShaderResourceView* depthMapText[2];
 
 	RenderTexture* renderTexture;
 };
