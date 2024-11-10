@@ -43,8 +43,8 @@ private:
 	float lightDir2y = 0.1f;
 	float lightDir2z = 0.1f;
 
-	float light1Colour[3];
-	float light2Colour[3];
+	float light1Colour[3] = {0,0,0};
+	float light2Colour[3] = { 0,0,0 };
 
 	float matrixRotation = 0;
 
