@@ -78,23 +78,20 @@ float4 main(InputType input) : SV_TARGET
     float4 textureColour = shaderTexture.Sample(diffuseSampler, input.tex);
 	// Calculate the projected texture coordinates.
 
-        for (int i = 0; i < 2; i++)
-        {
-            aLight thisLight = mylights[i];
-            colour[i] = (0.0f, 0.0f, 0.0f, 1.0f);
-            float2 pTexCoord = getProjectiveCoords(input.lightViewPos[i]);
+    for (int i = 0; i < 2; i++)
+       {
+           aLight thisLight = mylights[i];
+           colour[i] = float4(0.0f, 0.0f, 0.0f, 1.0f); //NEED FLOAT 4 !!
+           float2 pTexCoord = getProjectiveCoords(input.lightViewPos[i]);
         
             if (hasDepthData(pTexCoord))
             {
-        // Has depth map data
                 if (!isInShadow(depthMapTexture[i], pTexCoord, input.lightViewPos[i], shadowMapBias))
                 {
-            // is NOT in shadow, therefore light
                     colour[i] = calculateLighting(-thisLight.direction, input.normal, thisLight.diffuse);
                 }
             }
-        //colour[i] = saturate(colour[i]);
-       
+        colour[i] = saturate(colour[i]);
     }
     return (saturate(colour[0] + colour[1] + mylights[0].ambient)) * textureColour;
 }

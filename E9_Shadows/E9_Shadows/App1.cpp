@@ -18,7 +18,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	sphereMesh2 = new SphereMesh(renderer->getDevice(), renderer->getDeviceContext());
 	cubeMesh2 = new CubeMesh(renderer->getDevice(), renderer->getDeviceContext());
 	orthoMesh = new OrthoMesh(renderer->getDevice(), renderer->getDeviceContext(), screenWidth / 4, screenHeight / 4, -screenWidth / 2.7, screenHeight / 2.7);
-
+	
 	model = new AModel(renderer->getDevice(), "res/teapot.obj");
 	textureMgr->loadTexture(L"brick", L"res/brick1.dds");
 
@@ -55,7 +55,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 
 	myLights[0]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
 	myLights[1]->generateOrthoMatrix((float)sceneWidth, (float)sceneHeight, 0.1f, 100.f);
-
+	
+	//myLights[0]->generateProjectionMatrix
 	screenW = screenWidth;
 	
 }
@@ -245,7 +246,7 @@ void App1::finalPass()
 	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, depthMapText[0]);
 	textureShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
 
-	worldMatrix = XMMatrixTranslation(screenW * 1.35, 0, 0);
+	worldMatrix += XMMatrixTranslation(screenW * 1.35, 0, 0);
 	orthoMesh->sendData(renderer->getDeviceContext());
 	textureShader->setShaderParameters(renderer->getDeviceContext(), worldMatrix, orthoViewMatrix, orthoMatrix, depthMapText[1]);
 	textureShader->render(renderer->getDeviceContext(), orthoMesh->getIndexCount());
